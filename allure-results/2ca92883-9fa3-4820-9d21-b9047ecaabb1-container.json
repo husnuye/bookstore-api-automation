@@ -1,0 +1,1 @@
+{"uuid":"2ca92883-9fa3-4820-9d21-b9047ecaabb1","name":"TC06 - Get book by another valid ID (happy path)","children":["c2674152-ae9a-4808-be56-fd7ede204aa2"],"befores":[{"name":"resetRestAssuredSpecs","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1752692585531,"stop":1752692585531}],"afters":[],"start":1752692585529,"stop":1752692586411}

@@ -1,0 +1,1 @@
+{"uuid":"48b7bea1-69e2-428d-859e-0e857147c6ff","name":"TC04 - Update book (smoke, happy path)","children":["7abc6489-ee84-42a0-9acb-f19a1a679d7b"],"befores":[{"name":"resetRestAssuredSpecs","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1752692279275,"stop":1752692279275}],"afters":[],"start":1752692279271,"stop":1752692280826}

@@ -1,0 +1,1 @@
+{"uuid":"20322f3f-14f4-43b5-b03a-62215dfe1d75","name":"TC01 - Get all books (smoke, happy path)","children":["2b7e3992-f242-423f-8228-d8cbe6503cef"],"befores":[{"name":"resetRestAssuredSpecs","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1752694163617,"stop":1752694163617}],"afters":[],"start":1752694163427,"stop":1752694165405}
