@@ -2,6 +2,7 @@ package com.bookstore.api;
 
 import io.restassured.response.Response;
 import io.restassured.http.ContentType;
+import io.qameta.allure.restassured.AllureRestAssured; // <-- Allure filter import
 
 import static io.restassured.RestAssured.*;
 
@@ -17,6 +18,7 @@ public class BooksClient {
      */
     public static Response getAllBooks() {
         return given()
+                .filter(new AllureRestAssured())
                 .contentType(ContentType.JSON)
                 .log().all() // Logs the request details for debugging
                 .when()
@@ -30,6 +32,21 @@ public class BooksClient {
      */
     public static Response getBookById(int id) {
         return given()
+                .filter(new AllureRestAssured())
+                .contentType(ContentType.JSON)
+                .log().all()
+                .when()
+                .get("/api/v1/Books/" + id);
+    }
+
+    /**
+     * GET a single book by string ID (for edge cases).
+     * @param id Book ID as string (can be number, string, special char, etc.)
+     * @return HTTP response object containing the book/error
+     */
+    public static Response getBookById(String id) {
+        return given()
+                .filter(new AllureRestAssured())
                 .contentType(ContentType.JSON)
                 .log().all()
                 .when()
@@ -43,6 +60,7 @@ public class BooksClient {
      */
     public static Response addBook(Object book) {
         return given()
+                .filter(new AllureRestAssured())
                 .contentType(ContentType.JSON)
                 .log().all()
                 .body(book)
@@ -58,6 +76,7 @@ public class BooksClient {
      */
     public static Response updateBook(int id, Object book) {
         return given()
+                .filter(new AllureRestAssured())
                 .contentType(ContentType.JSON)
                 .log().all()
                 .body(book)
@@ -72,6 +91,21 @@ public class BooksClient {
      */
     public static Response deleteBook(int id) {
         return given()
+                .filter(new AllureRestAssured())
+                .contentType(ContentType.JSON)
+                .log().all()
+                .when()
+                .delete("/api/v1/Books/" + id);
+    }
+
+    /**
+     * DELETE a book by string ID (for edge case tests).
+     * @param id Book ID as string (number, string, special char, etc.)
+     * @return HTTP response object
+     */
+    public static Response deleteBook(String id) {
+        return given()
+                .filter(new AllureRestAssured())
                 .contentType(ContentType.JSON)
                 .log().all()
                 .when()

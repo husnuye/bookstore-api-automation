@@ -1,0 +1,1 @@
+{"uuid":"e9d2b8cf-eefd-4d87-8a72-b37e8ca77186","name":"TC17 - Create book with empty body (edge)","children":["62b03fd4-62c8-4c55-a9a1-6da4bd921bcc"],"befores":[{"name":"resetRestAssuredSpecs","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1752692281844,"stop":1752692281844}],"afters":[],"start":1752692281841,"stop":1752692282202}

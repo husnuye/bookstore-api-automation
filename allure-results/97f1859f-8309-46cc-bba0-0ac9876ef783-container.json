@@ -1,0 +1,1 @@
+{"uuid":"97f1859f-8309-46cc-bba0-0ac9876ef783","name":"TC05 - Delete book (smoke, happy path)","children":["5c0f8578-34f4-48e1-9b92-bd24dc9f7ac8"],"befores":[{"name":"resetRestAssuredSpecs","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1752692581588,"stop":1752692581588}],"afters":[],"start":1752692581586,"stop":1752692581936}
