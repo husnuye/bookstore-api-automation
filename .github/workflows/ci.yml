@@ -22,17 +22,17 @@ jobs:
     name: Smoke Tests
 
     steps:
-      # Checks-out repository under $GITHUB_WORKSPACE
+      # Checkout repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
 
-      # Sets up Java 17 for Maven build
+      # Set up Java 17 for Maven build
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # Caches Maven dependencies to speed up builds
+      # Cache Maven dependencies to speed up builds
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
@@ -42,12 +42,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Runs only SMOKE tests (fast, critical test cases)
+      # Run only SMOKE tests (fast, critical test cases)
       - name: Run SMOKE tests only
-        run: mvn test -Dgroups="smoke" -Dallure.results.directory=target/allure-results
+        run: mvn test -Dgroups="smoke" -Dallure.results.directory=target/allure-results || true
 
-      # Uploads Allure test results as artifact for later reporting
+      # Always upload Allure results (even if tests fail)
       - name: Upload Allure Results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-smoke
@@ -61,17 +62,17 @@ jobs:
     name: Nightly Regression Tests
 
     steps:
-      # Checks-out repository under $GITHUB_WORKSPACE
+      # Checkout repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
 
-      # Sets up Java 17 for Maven build
+      # Set up Java 17 for Maven build
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # Caches Maven dependencies to speed up builds
+      # Cache Maven dependencies to speed up builds
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
@@ -81,12 +82,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Runs full REGRESSION test suite (comprehensive coverage)
+      # Run full REGRESSION test suite (comprehensive coverage)
       - name: Run REGRESSION tests (all)
-        run: mvn test -Dgroups="regression" -Dallure.results.directory=target/allure-results
+        run: mvn test -Dgroups="regression" -Dallure.results.directory=target/allure-results || true
 
-      # Uploads Allure test results as artifact for later reporting
+      # Always upload Allure results (even if tests fail)
       - name: Upload Allure Results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-regression
@@ -95,4 +97,4 @@ jobs:
 # NOTES:
 # - Smoke tests run for every push and PR to main for quick feedback on core functionality.
 # - Regression tests run only at 3:00 AM UTC to avoid slowing down the main workflow, covering full test cases.
-# - Allure results are uploaded for later reporting and analysis.
+# - Allure results are uploaded for later reporting and analysis, even when tests fail (for debugging/failure investigation).
