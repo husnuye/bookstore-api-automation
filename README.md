@@ -7,23 +7,81 @@ A clean, scalable, enterprise-grade API automation framework for Books and Autho
 
 ## Project Structure
 
-bookstore-api-automation/
-├── src/main/java/com/bookstore/api/        # API client classes
-├── src/main/java/com/bookstore/model/      # Data models (POJO/DTO)
-├── src/main/java/com/bookstore/utils/      # Utility classes
-├── src/test/java/com/bookstore/base/       # Base test class
-├── src/test/java/com/bookstore/tests/      # Test classes
-├── src/test/java/com/bookstore/data/       # Test data providers (optional)
-├── src/test/resources/                     # config.properties, testdata.json
-├── pom.xml                                 # Maven build file
-├── Dockerfile                              # Docker containerization
-├── Jenkinsfile                             # Jenkins pipeline
-├── .github/workflows/ci.yml                # GitHub Actions pipeline
-├── README.md                               # This file
+bookstore-api-automation/  
+├── src/main/java/com/bookstore/api/        # API client classes  
+├── src/main/java/com/bookstore/model/      # Data models (POJO/DTO)  
+├── src/main/java/com/bookstore/utils/      # Utility classes  
+├── src/test/java/com/bookstore/base/       # Base test class  
+├── src/test/java/com/bookstore/tests/      # Test classes  
+├── src/test/java/com/bookstore/data/       # Test data providers (optional)  
+├── src/test/resources/                     # config.properties, testdata.json  
+├── pom.xml                                 # Maven build file  
+├── Dockerfile                              # Docker containerization  
+├── Jenkinsfile                             # Jenkins pipeline  
+├── .github/workflows/ci.yml                # GitHub Actions pipeline  
+├── README.md                               # This file  
 
 ---
 
 ## How to Run
+
+### Locally
+```sh
+mvn clean test
+# (Optional) Edit src/test/resources/config.properties for the API base URL if needed.
+## How to Run
+
+
+Allure Report (Local)
+allure serve target/allure-results
+# or
+allure generate target/allure-results --clean -o test-report
+open test-report/index.html
+
+Docker
+	•	The project includes a Dockerfile using Maven and JDK 17.
+	•	API base URL can be overridden with the BASE_URL environment variable (default: FakeRestAPI).
+	•	Docker image builds even if tests fail (for easier debugging).
+
+Build and Run:
+
+docker build -t bookstore-api-automation .
+docker run --rm bookstore-api-automation
+
+	•	Allure results will be in /project/target/allure-results inside the container.
+
+CI/CD (GitHub Actions & Jenkins)
+	•	Every push or PR to main triggers smoke tests for fast feedback.
+	•	Every night at 3:00 AM UTC, the full regression suite runs automatically.
+	•	Allure test results are uploaded as artifacts after each run, even if tests fail.
+	•	See .github/workflows/ci.yml for full details.
+
+
+Test Tagging Examples
+
+mvn test -Dgroups="smoke"
+mvn test -Dgroups="regression"
+
+Best Practices
+	•	SOLID, maintainable, readable code.
+	•	Tests are organized by API/resource and by happy/edge case.
+	•	Tagging enables flexible suite execution and reporting.
+	•	Configuration and test data externalized.
+	•	Clean separation between API client (request/response), test code (assertions), and utilities.
+
+⸻
+
+Contributing & Contact
+
+Feel free to open an issue or submit a pull request.
+For questions or support, open an issue or contact the maintainer.
+
+
+
+
+
+
+
 
 **Locally:**
 ```sh
@@ -47,6 +105,9 @@ docker run --rm bookstore-api-automation
 CI/CD:
 	•	Tests run automatically on every push/PR in Jenkins/GitHub Actions.
 	•	Allure report is uploaded as build artifact.
+
+
+
 
 Tagging & Coverage
 

@@ -1,15 +1,17 @@
-# Use an official Maven + JDK 17 image as build
+
+# Start from an official Maven + JDK 17 image
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 
 WORKDIR /project
 
-COPY . /project
+COPY . .
 
-RUN mvn clean test
+ENV BASE_URL=https://fakerestapi.azurewebsites.net/api/v1
 
-# Optional: If you want to serve Allure report from inside container:
-# RUN apt-get update && apt-get install -y allure
-# RUN allure generate target/allure-results --clean -o /project/allure-report
+# Even if tests fail during the build stage, let the image be created!
+RUN mvn clean test -DbaseUrl=$BASE_URL -Dallure.results.directory=target/allure-results || true
 
-# Set default command
-CMD ["mvn", "clean", "test"]
+# (Optional) If only build and test results are required, a production image can be created here.
+# But for demo purposes, we can leave it as below.
+
+CMD ["mvn", "test", "-DbaseUrl=$BASE_URL", "-Dallure.results.directory=target/allure-results"]
