@@ -1,10 +1,18 @@
 # Bookstore API Automation Framework
 
-A clean, scalable, enterprise-grade API automation framework for Books and Authors endpoints.  
-**Tech stack:** Java 17, Maven, RestAssured, JUnit 5, Allure, Docker, Jenkins/GitHub Actions.
+A clean, scalable, enterprise-grade API automation framework for Books and Authors endpoints.
+
+**Tech Stack:** Java 17, Maven, RestAssured, JUnit 5, Allure, Docker, GitHub Actions.
+
+> Comprehensive end-to-end automated API testing for a sample Bookstore application.  
+> Covers all critical, regression, and edge scenarios with modular, maintainable, and CI/CD-ready code.  
+> Designed for rapid onboarding and easy extension by QA teams and backend developers.
 
 ---
 
+## Table of Contents
+
+1. [Project Structure](#project-structure)
 ## 📁 Project Structure
 
 bookstore-api-automation/
@@ -35,125 +43,202 @@ bookstore-api-automation/
 > Each part is separated for maintainability and clarity. Easy for both juniors and experienced engineers to navigate and extend.
 
 
-## How to Run the API Test Suite
 
-### 1. Local Execution
 
-- **Run All Tests:**
-  ```sh
-  mvn clean test
+2. [Features](#features)
 
-	•	(Optional) Update API endpoint by editing:
-src/test/resources/config.properties
+	•	Modern Java Tech Stack:
+Uses Java 17, Maven, RestAssured, JUnit 5, and Allure for robust and maintainable test automation.
+	•	Modular & Scalable Structure:
+Clean separation of API client, data models, test logic, and utilities for easy scaling and maintenance.
+	•	Powerful API Coverage:
+Covers both Books and Authors endpoints, with full support for CRUD, validation, edge, and regression tests.
+	•	Test Prioritization & Tagging:
+Test cases grouped by business priority (P1–P5), with JUnit tags for flexible suite execution (smoke, regression, happy, edge, etc).
+	•	Allure Reporting:
+Produces interactive, visual Allure test reports with rich metadata (severity, steps, attachments, etc).
+	•	Docker-Ready:
+Includes a Dockerfile for fully isolated test runs—no local setup needed.
+	•	CI/CD Integration:
+GitHub Actions support for automated runs on every push/PR; nightly full regression; Allure results archived as build artifacts.
+	•	Configurable & Extensible:
+API base URL, test data, and config are externalized for quick environment switching and easier maintenance.
+	•	Best Practices by Default:
+Enforces SOLID, DRY, and clean code principles—easy for new contributors and scales for large teams.
 
-Viewing Allure Reports Locally
-	•	Serve Interactive Report:
 
+3. [Getting Started](#getting-started)
+
+# 1. Clone the repository
+git clone https://github.com/husnuye/bookstore-api-automation.git
+cd bookstore-api-automation
+
+# 2. Install prerequisites
+#    (Java 17+, Maven 3.8+, optionally Docker & Allure CLI)
+
+# 3. Build the project
+mvn clean install
+
+# 4. (Optional) Update API endpoint in:
+#    src/test/resources/config.properties
+#    or set BASE_URL as env variable (for Docker)
+
+# 5. Run all tests
+mvn test
+
+# 6. View Allure report (interactive)
 allure serve target/allure-results
 
-	•	Generate Static HTML Report:
-
+#    or generate static HTML report
 allure generate target/allure-results --clean -o test-report
-open test-report/index.html   # Mac
+open test-report/index.html   # On Mac
+# (On Windows: open test-report/index.html in your browser)
 
-(On Windows: Open test-report/index.html in your browser.)
-
-2. Running with Docker
-	•	This project ships with a ready-to-use Dockerfile (Maven + JDK 17).
-	•	The API base URL can be customized at runtime using the BASE_URL environment variable.
-	•	The image will be built even if some tests fail, so you can always access the results for troubleshooting.
-	
-Build & Run:
-
+# 7. Run with Docker
 docker build -t bookstore-api-automation .
-docker run --rm \
-  -v $(pwd)/target/allure-results:/project/target/allure-results \
-  bookstore-api-automation
+docker run --rm -v $(pwd)/target/allure-results:/project/target/allure-results bookstore-api-automation
 
-	•	The test results (allure-results) will be available in your local target/allure-results folder.
+# --- OPTIONAL: Push your local code to your own GitHub repository ---
 
-⸻
+# a) Create a new GitHub repo at https://github.com/new
+# b) Link your local project to your GitHub repo:
+git remote add origin https://github.com/<your-username>/<your-repo>.git
 
-3. Continuous Integration (CI/CD)
-	•	Every push or pull request runs the smoke test suite automatically (see .github/workflows/ci.yml).
-	•	Full regression runs nightly at 3:00 AM UTC.
-	•	Allure reports are saved as CI build artifacts and can be downloaded for review.
+# c) Stage and commit your changes:
+git add .
+git commit -m "Initial commit: Setup Bookstore API automation framework"
 
-⸻
+# d) Push your changes to GitHub (main branch, or your branch name):
+git push -u origin main
 
-4. Test Tagging & Filtering
-	•	You can run specific groups of tests, for example:
+# e) For updates, pull remote changes before pushing again:
+git pull origin main
+
+# f) If working on a branch:
+git checkout -b feature/my-feature
+git push -u origin feature/my-feature
+
+# g) Open a pull request on GitHub to merge your branch (if using feature branches).
+4. [Running the Test Suite](#running-the-test-suite)
+
+# Run the full test suite locally with Maven:
+mvn clean test
+
+# (Optional) To run specific groups using JUnit tags:
 mvn test -Dgroups="smoke"
 mvn test -Dgroups="regression"
+# or
+mvn test -Dgroups="happy"
+mvn test -Dgroups="edge"
 
-	•	(Or use JUnit 5 tags with @Tag("smoke"), etc.)
+# View the Allure report interactively:
+allure serve target/allure-results
 
-⸻
+# Or generate a static HTML report and open it:
+allure generate target/allure-results --clean -o test-report
+open test-report/index.html   # (For Mac)
+# On Windows: Double-click test-report/index.html to open in browser
 
-5. Best Practices
-	•	Codebase follows SOLID and clean code principles.
-	•	Test cases are organized by resource and scenario type (happy path, edge case).
-	•	Tags allow flexible suite execution.
-	•	Configuration and test data are externalized for easy maintenance.
-	•	API client, test logic, and utilities are kept separate for clarity.
+# Run the tests inside Docker:
+docker build -t bookstore-api-automation .
+docker run --rm -v $(pwd)/target/allure-results:/project/target/allure-results bookstore-api-automation
 
-⸻
+# (After Docker run, view the allure-results as above.)
 
-Additional Notes
-	•	Docker builds and Allure results are always generated, even if some tests fail.
-	•	API environments can be switched quickly via config.properties or the BASE_URL environment variable.
+5. [Viewing Allure Reports](#viewing-allure-reports)
 
+# After running the test suite, you can generate and view Allure reports as follows:
 
+# 1. To view an interactive report in your browser (recommended for local exploration):
+allure serve target/allure-results
 
-Tagging & Coverage
+# 2. To generate a static HTML report (for sharing or storing in CI):
+allure generate target/allure-results --clean -o test-report
 
-## Tagging & Coverage
+# 3. Open the generated report:
+open test-report/index.html      # (Mac)
+# On Windows: Double-click test-report/index.html to open in your browser.
 
-| Tag        | Purpose                                              |
-|------------|-----------------------------------------------------|
-| api        | All API endpoint tests                              |
-| smoke      | Critical-path, fast regression (basic happy path)   |
-| regression | Full functional suite (all happy/edge cases)        |
-| happy      | Positive path test                                  |
-| edge       | Negative/boundary/error case                        |
-
-
-
-✅ Automated Books API Test Coverage
-
-This project currently automates the following Books API test cases, grouped by priority:
-	•	P1 (Blocker): TC01, TC02, TC16, TC23, TC27,TC33 
-	•	P2 (Critical): TC03, TC04, TC05,TC11  
-	.   P3 (Normal):  TC06, TC07, TC08, TC09, TC10,TC39  
+# Note:
+# - The "allure-results" directory is automatically populated after each test run.
+# - If running tests via Docker, results are mapped to your local "target/allure-results" folder for easy access.
+# - In CI pipelines (GitHub Actions, Jenkins, etc.), the report can be archived or published as a build artifact.
 
 
-Total: 16 automated critical test cases, including all smoke and main regression flows.
+6. [Test Tagging & Filtering](#test-tagging--filtering)
 
-⸻
+# You can filter and run specific groups of tests using JUnit 5 tags.
+# Example usages:
 
-✅ Automated Authors API Test Coverage
+# 1. Run only smoke tests (critical path, fast checks):
+mvn test -Dgroups="smoke"
+# or using JUnit tags:
+mvn test -Dtest=* -Dgroups=smoke
 
-This suite automates the following Authors API test cases:
-	•	P1 (Blocker): TC01, TC02, TC16, TC22
-	•	P2 (Critical): TC03, TC04, TC05
-	•	P3 (Normal): TC06, TC07, TC08, TC09
+# 2. Run all regression tests (full functional suite):
+mvn test -Dgroups="regression"
 
-Total: 11 automated test cases (all P1 and P2 covered, plus main P3 scenarios).
+# 3. Run only happy path (positive) scenarios:
+mvn test -Dgroups="happy"
 
-⸻
-             |
+# 4. Run only edge cases (negative, boundary):
+mvn test -Dgroups="edge"
 
-| Priority         | Description                                               | Allure Severity | Example Issues                                      |
-|------------------|----------------------------------------------------------|-----------------|-----------------------------------------------------|
-| P1 (Blocker)     | Release cannot proceed. Total system or business outage. | blocker         | API down, login fails, cannot create/read core data |
-| P2 (Critical)    | Major failure in core functionality, must fix to release.| critical        | Book not created, core workflow fails               |
-| P3 (Normal/Major)| Important but not blocking main flow.                    | normal          | Validation errors, secondary features, alternate flow bugs |
-| P4 (Minor)       | Minor issue, does not block release.                     | minor           | Small bug, edge case, optional field                |
-| P5 (Trivial)     | Cosmetic only, no business impact.                       | trivial         | UI typo, whitespace, label misalignment             |
+# 5. Combine tags for custom suites (example: all API regression and edge tests):
+mvn test -Dgroups="api,regression,edge"
+
+# Notes:
+# - All test methods are tagged (e.g. @Tag("smoke"), @Tag("regression"), etc.) for flexible filtering.
+# - You can create your own tag combinations as needed.
+# - Use these filters in your local runs, CI pipelines, or Docker.
 
 
-> Tags are used to organize and selectively run different suites (smoke, regression, etc.).
-> Priority/Severity defines business impact and release/blocking status.
+
+7. [Test Coverage & Prioritization](#test-coverage--prioritization)
+
+> **Test Coverage & Prioritization**
+
+This framework provides automated coverage for the most critical Books and Authors API scenarios, prioritized by business risk and impact. Test cases are grouped by priority according to industry standards and Allure reporting conventions:
+
+- **P1 (Blocker):** Must-pass, release-stopper tests (e.g., core CRUD operations, mandatory validation)
+- **P2 (Critical):** High-risk, core feature coverage (e.g., critical paths, high-impact errors)
+- **P3 (Normal):** Main regression, business-as-usual flows (positive & negative, but not blocking)
+- **P4 (Minor):** Validation, optional, or edge scenarios (not blocking for release)
+- **P5 (Trivial):** Exploratory, UI/cosmetic, or rare edge cases
+
+**Current Automated Test Coverage:**
+
+_Books API:_
+- **P1 (Blocker):** TC01, TC02, TC16, TC23, TC27, TC33
+- **P2 (Critical):** TC03, TC04, TC05, TC11
+- **P3 (Normal):** TC06, TC07, TC08, TC09, TC10, TC39  
+- **Total Automated:** 16 high-priority scenarios (all critical and main regression flows covered)
+
+_Authors API:_
+- **P1 (Blocker):** TC01, TC02, TC16, TC22
+- **P2 (Critical):** TC03, TC04, TC05
+- **P3 (Normal):** TC06, TC07, TC08, TC09  
+- **Total Automated:** 11 test cases (all P1 & P2, plus main P3 scenarios)
+
+> Lower-priority (P4, P5) cases can be added easily thanks to the modular, tag-driven structure.
+
+| Priority | Description             | Allure Severity | Example                          |
+|----------|------------------------|-----------------|-----------------------------------|
+| P1       | Blocker, must pass     | blocker         | API down, cannot create/read      |
+| P2       | Critical, high risk    | critical        | Core workflow fails               |
+| P3       | Normal (regression)    | normal          | Validation, main flows            |
+| P4       | Minor                  | minor           | Edge, optional, boundary          |
+| P5       | Trivial                | trivial         | Cosmetic, exploratory             |
+
+*See README for detailed test case breakdown.*
+
+
+8. [Test Scenarios](#test-scenarios)  
+
+All key API flows, validation checks, and regression scenarios are automated and tracked below for both Books and Authors endpoints.  
+The table summarizes test case names, priorities, Allure severity, tags, high-level steps, and expected results.  
+(For full traceability and test documentation, refer to the codebase and Allure reports.)
+
 
 
 ## Books API Test Suite
@@ -228,10 +313,6 @@ Total: 11 automated test cases (all P1 and P2 covered, plus main P3 scenarios).
 
 
 
-
-
-
-
 ## Authors API Test Suite
 
 | TC   | Test Name                                         | Priority | Allure Severity | Tags                                | Steps / Summary                                 | Expected Result           |
@@ -285,17 +366,71 @@ Additional edge cases and Author endpoint tests can be easily added due to the s
 > - **Edge:** Negative, boundary, invalid, or error-prone scenarios, designed to test API robustness and error handling.
 
 
-Best Practices
-	•	SOLID, maintainable, readable code
-	•	Tests are organized by API/resource and by happy/edge case
-	•	Tagging enables flexible suite execution and reporting
-	•	Configuration and test data externalized
-	•	Clean separation between API client (request/response), test code (assertions), and utilities
 
 
-Contributing & Contact
+9. [CI/CD Integration](#cicd-integration)  
 
-Feel free to open an issue or submit a pull request.
-For questions or support, contact: [your-email@example.com]
+##  CI/CD Integration
+
+> The framework is designed for seamless integration with modern CI/CD pipelines:
+>
+> - **GitHub Actions:**  
+>   - All pushes and pull requests automatically trigger the smoke suite (`.github/workflows/ci.yml`).
+>   - Nightly full regression runs are scheduled (configurable).
+>   - Allure reports are archived as build artifacts and can be downloaded after each run.
+>
+
+> - **Docker:**  
+>   - Tests can be executed in isolated containers.
+>   - Ensures clean, reproducible environments for every build.
+>
+> - **Environment Configuration:**  
+>   - API endpoints and credentials are externalized in properties files and environment variables.
+>
+> _See `.github/workflows/ci.yml` and `Dockerfile` for ready-to-use templates and further details._
+
+
+10. [Best Practices](#best-practices)  
+
+##  Best Practices
+
+> - Follows **SOLID** and clean code principles for all test and client code.
+> - **Separation of concerns:**  
+>   - API client, test logic, and test data are all in separate packages.
+> - **Reusable code:**  
+>   - Common setup/teardown is in a shared base class.
+>   - Test data and configurations are externalized.
+> - **Descriptive tagging:**  
+>   - Uses tags for smoke, regression, happy, and edge cases.
+> - **Maintainable structure:**  
+>   - Project structure is modular, clear, and easy to extend.
+> - **Reporting & Traceability:**  
+>   - Allure reporting integrated for easy test traceability.
+> - **Configurable environments:**  
+>   - API URLs, credentials, and other settings can be quickly switched.
+> - **Ready for CI/CD:**  
+>   - Runs headless in Docker or any pipeline (no UI/IDE needed).
+> - **Easy onboarding:**  
+>   - Clear README and directory structure for fast onboarding.
+
+11. [Contributing](#contributing)  
+
+##  Contributing
+
+> - **Pull requests are welcome!**  
+>   - Please open an issue first to discuss any major changes.
+> - **For bug fixes, feature suggestions, or documentation updates:**  
+>   - Fork the repository, create a new branch, and submit a pull request.
+> - **Follow the project’s code style and structure.**
+> - **Write clear commit messages and comments.**
+> - **All new features or test cases should include relevant unit or integration tests.**
+> - For any questions, feel free to open an issue or reach out (see Contact below).
+
+
+12. [Contact](#contact)
+---
+## Contact
+
+ For any questions about this case study or the framework, please contact the project owner via GitHub issues or email.
 
 
