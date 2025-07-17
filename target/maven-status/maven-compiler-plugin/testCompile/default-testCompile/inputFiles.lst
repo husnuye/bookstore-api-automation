@@ -1,3 +1,5 @@
 /Users/husnuye/bookstore-api-automation/src/test/java/com/bookstore/base/BaseTest.java
-/Users/husnuye/bookstore-api-automation/src/test/java/com/bookstore/data/TestDataProvider.java
+/Users/husnuye/bookstore-api-automation/src/test/java/com/bookstore/data/AuthorTestDataProvider.java
+/Users/husnuye/bookstore-api-automation/src/test/java/com/bookstore/data/BookTestDataProvider.java
+/Users/husnuye/bookstore-api-automation/src/test/java/com/bookstore/tests/AuthorsTest.java
 /Users/husnuye/bookstore-api-automation/src/test/java/com/bookstore/tests/BooksTest.java

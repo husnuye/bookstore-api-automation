@@ -1,0 +1,1 @@
+{"uuid":"9b8ea6d7-a5c6-4899-9db0-3c043218ccc6","name":"TC08 - Update existing author with new data","children":["419427cb-7cbb-4b92-8b97-c975fe690058"],"befores":[{"name":"resetRestAssuredSpecs","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1752778342858,"stop":1752778342858}],"afters":[],"start":1752778342857,"stop":1752778343246}

@@ -1,0 +1,1 @@
+{"uuid":"c25c3818-a2b4-4b15-b121-6c34c1eabd07","name":"TC07 - Create new author (all valid fields)","children":["d634305b-3540-43e3-9a92-6a5e963e03eb"],"befores":[{"name":"resetRestAssuredSpecs","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1752778342496,"stop":1752778342496}],"afters":[],"start":1752778342495,"stop":1752778342855}

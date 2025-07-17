@@ -1,0 +1,1 @@
+{"uuid":"1557e6e5-6d68-4749-a32f-80f50275a114","name":"TC03 - Get author by ID (just created)","children":["4c9f90b7-fff6-4630-99c9-390cf79f47c9"],"befores":[{"name":"resetRestAssuredSpecs","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1752778340510,"stop":1752778340510}],"afters":[],"start":1752778340508,"stop":1752778340896}

@@ -1,0 +1,1 @@
+{"uuid":"8d95ed3d-2110-4c72-8802-51ba00690f02","name":"TC05 - Delete author","children":["fee36282-3031-4cf8-acf5-c8a18237c999"],"befores":[{"name":"resetRestAssuredSpecs","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1752778341259,"stop":1752778341259}],"afters":[],"start":1752778341259,"stop":1752778341664}
