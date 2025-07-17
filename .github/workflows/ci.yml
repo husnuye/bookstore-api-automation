@@ -1,8 +1,5 @@
 name: Bookstore API CI/CD Pipeline
 
-# Triggers:
-# - On push or PR to main branch, runs smoke tests (quick health check).
-# - On schedule (every night at 3:00 AM UTC), runs full regression suite.
 on:
   push:
     branches:
@@ -16,85 +13,76 @@ on:
 jobs:
   # ---------------- SMOKE TEST JOB ----------------
   smoke:
-    # Run this job only for push or PR events (NOT on schedule)
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    name: Smoke Tests
+    name: Smoke Tests (Dockerized)
 
     steps:
-      # Checkout repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
 
-      # Set up Java 17 for Maven build
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+      # Set up Docker Buildx for modern Docker build support
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      # Cache Maven dependencies to speed up builds
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+      # Build Docker image for tests
+      - name: Build Docker image
+        run: docker build -t bookstore-api-tests .
 
-      # Run only SMOKE tests (fast, critical test cases)
-      - name: Run SMOKE tests only
-        run: mvn test -Dgroups="smoke" -Dallure.results.directory=target/allure-results || true
+      # Run the container (test execution)
+      - name: Run Smoke Tests in Docker container
+        id: run-tests
+        run: |
+          docker run --name bookstore-api-tests-smoke bookstore-api-tests mvn test -Dgroups="smoke" -Dallure.results.directory=target/allure-results || true
 
-      # Always upload Allure results (even if tests fail)
+      # Copy Allure results from Docker container to host machine
+      - name: Copy Allure Results from Docker container
+        run: |
+          docker cp bookstore-api-tests-smoke:/project/target/allure-results ./allure-results-smoke || true
+
+      # Remove test container to clean up
+      - name: Remove test container
+        run: |
+          docker rm bookstore-api-tests-smoke || true
+
+      # Upload Allure results
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-smoke
-          path: target/allure-results
+          path: allure-results-smoke
 
   # ------------- REGRESSION TEST JOB (NIGHTLY) -------------
   regression:
-    # Run this job only for scheduled nightly build
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
-    name: Nightly Regression Tests
+    name: Nightly Regression Tests (Dockerized)
 
     steps:
-      # Checkout repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
 
-      # Set up Java 17 for Maven build
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      # Cache Maven dependencies to speed up builds
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+      - name: Build Docker image
+        run: docker build -t bookstore-api-tests .
 
-      # Run full REGRESSION test suite (comprehensive coverage)
-      - name: Run REGRESSION tests (all)
-        run: mvn test -Dgroups="regression" -Dallure.results.directory=target/allure-results || true
+      - name: Run Regression Tests in Docker container
+        id: run-tests
+        run: |
+          docker run --name bookstore-api-tests-reg bookstore-api-tests mvn test -Dgroups="regression" -Dallure.results.directory=target/allure-results || true
 
-      # Always upload Allure results (even if tests fail)
+      - name: Copy Allure Results from Docker container
+        run: |
+          docker cp bookstore-api-tests-reg:/project/target/allure-results ./allure-results-regression || true
+
+      - name: Remove test container
+        run: |
+          docker rm bookstore-api-tests-reg || true
+
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-regression
-          path: target/allure-results
-
-# NOTES:
-# - Smoke tests run for every push and PR to main for quick feedback on core functionality.
-# - Regression tests run only at 3:00 AM UTC to avoid slowing down the main workflow, covering full test cases.
-# - Allure results are uploaded for later reporting and analysis, even when tests fail (for debugging/failure investigation).
+          path: allure-results-regression
