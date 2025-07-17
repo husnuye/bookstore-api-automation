@@ -1,0 +1,1 @@
+{"uuid":"c0072e6d-57fa-4cef-b715-1dacb4e57e41","name":"TC01 - Get all authors (smoke, happy path)","children":["8e925d67-e2b3-4f92-beca-9010dfdf98d0"],"befores":[{"name":"resetRestAssuredSpecs","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1752778338856,"stop":1752778338856}],"afters":[],"start":1752778338851,"stop":1752778339352}

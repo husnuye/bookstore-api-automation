@@ -1,0 +1,1 @@
+{"uuid":"cf2a520c-c966-4245-a484-60c375845aa0","name":"TC02 - Create new author (smoke, happy path)","children":["f7b98814-7983-4116-8ebb-43d0a9402b46"],"befores":[{"name":"resetRestAssuredSpecs","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1752778339354,"stop":1752778339354}],"afters":[],"start":1752778339353,"stop":1752778339734}

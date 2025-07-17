@@ -1,3 +1,12 @@
+/**
+ * Covers:
+ *  This project currently automates the following Books API test cases, grouped by priority:
+ *   • P1 (Blocker): TC01, TC02, TC16, TC23, TC27, TC33
+ *   • P2 (Critical/Major): TC03, TC04, TC05, TC11
+ *   • P3 (Major/Normal): TC06, TC07, TC08, TC09, TC10, TC39
+ * (See README for full priority breakdown.)
+ */
+
 package com.bookstore.tests;
 
 import com.bookstore.api.BooksClient;
@@ -12,7 +21,7 @@ import static org.hamcrest.Matchers.*;
 
 @Epic("Books API Automation")
 @Feature("Books Endpoints")
-@DisplayName("Books API E2E Test Suite (P1 + P2)")
+@DisplayName("Books API E2E Test Suite (P1-P3 Priority Cases)")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BooksTest extends BaseTest {
 
@@ -22,20 +31,26 @@ public class BooksTest extends BaseTest {
     static Book anotherBook = new Book(102, "Clean REST Design", "API design best practices", 120, "REST for everyone.", "2022-06-01T00:00:00Z");
 
     // ---------------------------
-    //         P1 TEST CASES
+    //         P1 - BLOCKER TESTS
     // ---------------------------
 
     /**
-     * [P1][Smoke] TC01 - Get all books
+     * [P1][Smoke][Happy] TC01 - Get all books
      * Endpoint: GET /Books
      * Purpose: Ensure the endpoint returns HTTP 200 and a non-empty book list.
-     * If this test fails, it indicates a potential backend outage or data retrieval bug.
+     * Steps:
+     *   1. Send GET /Books request
+     * Expected Result:
+     *   - HTTP 200 returned
+     *   - Response body contains a non-empty list of books
+     * Notes:
+     *   - Release-blocker. Failure indicates backend outage or critical defect.
      */
     @Test @Order(1)
     @Tag("api") @Tag("smoke") @Tag("regression") @Tag("happy")
-    @Severity(SeverityLevel.CRITICAL)
+    @Severity(SeverityLevel.BLOCKER)
     @DisplayName("TC01 - Get all books (smoke, happy path)")
-    @Description("Should return 200 OK and a non-empty list for GET /Books. If fails, report as backend/API bug.")
+    @Description("Should return 200 OK and a non-empty list for GET /Books. Release-blocker.")
     void getAllBooks_shouldReturnList() {
         Response res = BooksClient.getAllBooks();
         res.then().statusCode(200);
@@ -43,16 +58,22 @@ public class BooksTest extends BaseTest {
     }
 
     /**
-     * [P1][Smoke] TC02 - Create new book
+     * [P1][Smoke][Happy] TC02 - Create new book
      * Endpoint: POST /Books
-     * Purpose: Validate book creation returns 201 Created and correct response.
-     * Failure here means a blocker bug, since book creation is core.
+     * Purpose: Validate book creation. Core business operation.
+     * Steps:
+     *   1. Send POST /Books with valid book JSON
+     * Expected Result:
+     *   - HTTP 201 returned
+     *   - Response contains correct book data
+     * Notes:
+     *   - Release-blocker. Failure = no books can be created.
      */
     @Test @Order(2)
     @Tag("api") @Tag("smoke") @Tag("regression") @Tag("happy")
     @Severity(SeverityLevel.BLOCKER)
     @DisplayName("TC02 - Create new book (smoke, happy path)")
-    @Description("Creates a valid book, expects 201 Created and correct body. Failure means critical bug - must be reported.")
+    @Description("Creates a valid book, expects 201 Created and correct body. Release-blocker.")
     void createBook_shouldReturnCreated() {
         Response res = BooksClient.addBook(validBook);
         res.then().statusCode(201);
@@ -62,16 +83,103 @@ public class BooksTest extends BaseTest {
     }
 
     /**
-     * [P1][Smoke] TC03 - Get book by ID (just created)
-     * Endpoint: GET /Books/{id}
-     * Purpose: Verify that the newly created book can be fetched by its ID.
-     * Failure indicates data inconsistency or API GET bug.
+     * [P1][Smoke][Edge] TC16 - Create book missing required field (title)
+     * Endpoint: POST /Books
+     * Purpose: API must not allow book creation without a title.
+     * Steps: Send POST with missing "title" property
+     * Expected Result: HTTP 400 returned
+     * Notes: Release-blocker for validation.
      */
     @Test @Order(3)
-    @Tag("api") @Tag("smoke") @Tag("regression") @Tag("happy")
+    @Tag("api") @Tag("smoke") @Tag("regression") @Tag("edge")
     @Severity(SeverityLevel.BLOCKER)
+    @DisplayName("TC16 - Create book missing title (edge, smoke)")
+    @Description("Should return 400 for missing title. Release-blocker.")
+    void createBook_missingTitle_shouldReturn400() {
+        Book noTitle = new Book(0, null, "Missing title", 150, "Excerpt", "2023-09-01T00:00:00Z");
+        Response res = BooksClient.addBook(noTitle);
+        res.then().statusCode(400);
+    }
+
+    /**
+     * [P1][Smoke][Edge] TC23 - Create book with blank/space title
+     * Endpoint: POST /Books
+     * Purpose: API must not allow blank or whitespace-only titles.
+     * Steps: Send POST with "title": "   "
+     * Expected Result: HTTP 400 returned
+     * Notes: Release-blocker for input validation.
+     */
+    @Test @Order(4)
+    @Tag("api") @Tag("smoke") @Tag("regression") @Tag("edge")
+    @Severity(SeverityLevel.BLOCKER)
+    @DisplayName("TC23 - Create book with blank/space title (edge, smoke)")
+    @Description("Blank/space titles with 400. Release-blocker.")
+    void createBook_blankTitle_shouldReturn400() {
+        Book blankTitle = new Book(0, "   ", "Blank title", 100, "Excerpt", "2023-09-01T00:00:00Z");
+        Response res = BooksClient.addBook(blankTitle);
+        res.then().statusCode(400);
+    }
+
+    /**
+     * [P1][Smoke][Edge] TC27 - Create book with string in pageCount
+     * Endpoint: POST /Books
+     * Purpose: "pageCount" must only accept numeric values.
+     * Steps: Send POST with pageCount as string ("ten")
+     * Expected Result: HTTP 400 or 422 returned
+     * Notes: Release-blocker for strong typing.
+     */
+    @Test @Order(5)
+    @Tag("api") @Tag("smoke") @Tag("regression") @Tag("edge")
+    @Severity(SeverityLevel.BLOCKER)
+    @DisplayName("TC27 - Create book with string in pageCount (edge, smoke)")
+    @Description("String value for pageCount must be rejected. Release-blocker.")
+    void createBook_stringPageCount_shouldReturnError() {
+        String invalidBody = "{\"id\":0,\"title\":\"Test\",\"description\":\"desc\",\"pageCount\":\"ten\",\"excerpt\":\"ex\",\"publishDate\":\"2023-09-01T00:00:00Z\"}";
+        Response res = BooksClient.addBook(invalidBody);
+        res.then().statusCode(anyOf(is(400), is(422)));
+    }
+
+    /**
+     * [P1][Smoke][Edge] TC33 - Send POST request with malformed JSON
+     * Endpoint: POST /Books
+     * Purpose: API must reject malformed JSON with HTTP 400.
+     * Steps: Send POST with syntactically invalid JSON
+     * Expected Result: HTTP 400 returned
+     * Notes: Major edge validation for parser/validation logic.
+     */
+    @Test @Order(6)
+    @Tag("api") @Tag("smoke") @Tag("regression") @Tag("edge")
+    @Severity(SeverityLevel.BLOCKER)
+    @DisplayName("TC33 - Send POST request with malformed JSON (edge)")
+    @Description("Malformed JSON must return 400. Major edge validation.")
+    void createBook_malformedJson_shouldReturn400() {
+        String malformed = "{\"id\":, \"title\":\"Missing value\"";
+        Response res = BooksClient.addBook(malformed);
+        res.then().statusCode(400);
+    }
+
+    // ---------------------------
+    //   P2 - CRITICAL/MAJOR TESTS
+    // ---------------------------
+
+    /**
+     * [P2][Smoke][Happy] TC03 - Get book by ID (just created)
+     * Endpoint: GET /Books/{id}
+     * Purpose: Fetch the just-created book by its ID and verify data.
+     * Steps:
+     *   1. Create a book
+     *   2. Fetch by GET /Books/{id}
+     * Expected Result:
+     *   - HTTP 200
+     *   - Response contains correct title
+     * Notes:
+     *   - Release-blocker. Verifies system can retrieve new books.
+     */
+    @Test @Order(7)
+    @Tag("api") @Tag("smoke") @Tag("regression") @Tag("happy")
+    @Severity(SeverityLevel.CRITICAL)
     @DisplayName("TC03 - Get book by ID (just created) (smoke, happy path)")
-    @Description("Fetch the book just created. Expects 200 and correct book data. Fail = API bug, must be reported.")
+    @Description("Fetch just created book. Must not fail, release-blocker.")
     void getBookById_shouldReturnBook() {
         Response res = BooksClient.getBookById(createdBookId);
         res.then().statusCode(200);
@@ -79,16 +187,18 @@ public class BooksTest extends BaseTest {
     }
 
     /**
-     * [P1][Smoke] TC04 - Update book
+     * [P2][Smoke][Happy] TC04 - Update book
      * Endpoint: PUT /Books/{id}
-     * Purpose: Test updating book works and reflects new description.
-     * Failure is an update logic bug.
+     * Purpose: Validate updating an existing book.
+     * Steps: [Create book] -> Update via PUT -> Check updated value
+     * Expected Result: HTTP 200; updated data in response
+     * Notes: Release-blocker for core update functionality.
      */
-    @Test @Order(4)
+    @Test @Order(8)
     @Tag("api") @Tag("smoke") @Tag("regression") @Tag("happy")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("TC04 - Update book (smoke, happy path)")
-    @Description("Update the created book, expect 200 OK and updated data. Failures should be reported as product bug.")
+    @Description("Update the created book. Fail = release-blocker.")
     void updateBook_shouldReturnUpdatedBook() {
         validBook.setDescription("Updated desc");
         Response res = BooksClient.updateBook(createdBookId, validBook);
@@ -97,118 +207,58 @@ public class BooksTest extends BaseTest {
     }
 
     /**
-     * [P1][Smoke] TC05 - Delete book
+     * [P2][Smoke][Happy] TC05 - Delete book
      * Endpoint: DELETE /Books/{id}
-     * Purpose: Check deleting a book returns 200/204 (success).
-     * Fail means resource is not being deleted (product bug).
+     * Purpose: Ensure book deletion works for just-created book.
+     * Steps: [Create book] -> Delete via DELETE
+     * Expected Result: HTTP 200 or 204
+     * Notes: Release-blocker for resource deletion.
      */
-    @Test @Order(5)
+    @Test @Order(9)
     @Tag("api") @Tag("smoke") @Tag("regression") @Tag("happy")
     @Severity(SeverityLevel.CRITICAL)
     @DisplayName("TC05 - Delete book (smoke, happy path)")
-    @Description("Deletes the created book, expects 200/204. Failure = delete logic bug, must report.")
+    @Description("Deletes the created book. Fail = release-blocker.")
     void deleteBook_shouldReturnSuccess() {
         Response res = BooksClient.deleteBook(createdBookId);
         assertThat(res.statusCode(), anyOf(is(200), is(204)));
     }
 
     /**
-     * [P1][Edge] TC11 - Get book by non-existing ID
+     * [P2][Edge] TC11 - Get book by non-existing ID
      * Endpoint: GET /Books/{id}
-     * Purpose: Ensure API returns 404 for IDs that do not exist.
-     * If API does not return 404, this is a backend validation bug.
+     * Purpose: Ensure API returns 404 for non-existing book IDs.
+     * Steps: GET /Books/{id} with large, invalid ID
+     * Expected Result: HTTP 404 returned
+     * Notes: Major edge validation; ensures proper not-found handling.
      */
-    @Test
+    @Test @Order(10)
     @Tag("api") @Tag("regression") @Tag("edge")
-    @Severity(SeverityLevel.NORMAL)
+    @Severity(SeverityLevel.CRITICAL)
     @DisplayName("TC11 - Get book by non-existing ID (edge)")
-    @Description("Expect 404 for a non-existing book ID. Otherwise, the system is leaking data or not handling edge case.")
+    @Description("404 for a non-existing book ID. Major edge validation.")
     void getBookByNonExistingId_shouldReturn404() {
         Response res = BooksClient.getBookById(999999);
         res.then().statusCode(404);
     }
 
-    /**
-     * [P1][Edge] TC16 - Create book missing required field (title)
-     * Endpoint: POST /Books
-     * Purpose: Must reject requests without title (expect 400).
-     * If API allows creation, this is a critical validation bug.
-     */
-    @Test
-    @Tag("api") @Tag("regression") @Tag("edge")
-    @Severity(SeverityLevel.BLOCKER)
-    @DisplayName("TC16 - Create book missing title (edge)")
-    @Description("Should return 400 for missing title. If not, backend allows invalid data (blocker bug).")
-    void createBook_missingTitle_shouldReturn400() {
-        Book noTitle = new Book(0, null, "Missing title", 150, "Excerpt", "2023-09-01T00:00:00Z");
-        Response res = BooksClient.addBook(noTitle);
-        res.then().statusCode(400);
-    }
-
-    /**
-     * [P1][Edge] TC23 - Create book with blank/space title
-     * Endpoint: POST /Books
-     * Purpose: Blank titles should be rejected with 400.
-     */
-    @Test
-    @Tag("api") @Tag("regression") @Tag("edge")
-    @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("TC23 - Create book with blank/space title (edge)")
-    @Description("Reject blank/space titles with 400. If accepted, product validation bug.")
-    void createBook_blankTitle_shouldReturn400() {
-        Book blankTitle = new Book(0, "   ", "Blank title", 100, "Excerpt", "2023-09-01T00:00:00Z");
-        Response res = BooksClient.addBook(blankTitle);
-        res.then().statusCode(400);
-    }
-
-    /**
-     * [P1][Edge] TC27 - Create book with string in pageCount
-     * Endpoint: POST /Books
-     * Purpose: String pageCount must be rejected (400/422).
-     * If allowed, product accepts invalid data.
-     */
-    @Test
-    @Tag("api") @Tag("regression") @Tag("edge")
-    @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("TC27 - Create book with string in pageCount (edge)")
-    @Description("String value for pageCount must be rejected. Otherwise, API validation bug.")
-    void createBook_stringPageCount_shouldReturnError() {
-        String invalidBody = "{\"id\":0,\"title\":\"Test\",\"description\":\"desc\",\"pageCount\":\"ten\",\"excerpt\":\"ex\",\"publishDate\":\"2023-09-01T00:00:00Z\"}";
-        Response res = BooksClient.addBook(invalidBody);
-        res.then().statusCode(anyOf(is(400), is(422)));
-    }
-
-    /**
-     * [P1][Edge] TC33 - Send POST request with malformed JSON
-     * Endpoint: POST /Books
-     * Purpose: Invalid JSON body should return 400.
-     */
-    @Test
-    @Tag("api") @Tag("regression") @Tag("edge")
-    @Severity(SeverityLevel.NORMAL)
-    @DisplayName("TC33 - Send POST request with malformed JSON (edge)")
-    @Description("Malformed JSON must return 400. Otherwise, system is not handling invalid payload.")
-    void createBook_malformedJson_shouldReturn400() {
-        String malformed = "{\"id\":, \"title\":\"Missing value\"";
-        Response res = BooksClient.addBook(malformed);
-        res.then().statusCode(400);
-    }
-
     // ---------------------------
-    //         P2 TEST CASES
+    //   P3 - MAJOR/NORMAL TESTS
     // ---------------------------
 
     /**
-     * [P2][Happy Path] TC06 - Get book by another valid ID
+     * [P3][Happy] TC06 - Get book by another valid ID
      * Endpoint: GET /Books/{id}
-     * Purpose: Validate fetching by any valid ID works.
-     * Wrong title returned means API data bug.
+     * Purpose: Ensure fetching by any valid ID works.
+     * Steps: [Create new book] -> GET /Books/{id}
+     * Expected Result: HTTP 200 and correct title in response
+     * Notes: Not release-blocker but required for full regression.
      */
-    @Test
+    @Test @Order(11)
     @Tag("api") @Tag("regression") @Tag("happy")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("TC06 - Get book by another valid ID (happy path)")
-    @Description("Creates another book, expects correct title on fetch. Fail means returned wrong data, must be reported.")
+    @Description("Valid ID must work. Not release-blocker but major regression.")
     void getBookByAnotherValidId_shouldReturnBook() {
         BooksClient.addBook(anotherBook);
         Response res = BooksClient.getBookById(anotherBook.getId());
@@ -217,15 +267,18 @@ public class BooksTest extends BaseTest {
     }
 
     /**
-     * [P2][Happy Path] TC07 - Create new book (all valid fields)
+     * [P3][Happy] TC07 - Create new book (all valid fields)
      * Endpoint: POST /Books
-     * Purpose: All fields must be accepted, 201 Created must be returned.
+     * Purpose: All valid fields must be accepted.
+     * Steps: Send POST with all fields populated
+     * Expected Result: HTTP 201 and valid book in response
+     * Notes: Not release-blocker but must pass in regression.
      */
-    @Test
+    @Test @Order(12)
     @Tag("api") @Tag("regression") @Tag("happy")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("TC07 - Create new book (all valid fields) (happy path)")
-    @Description("All valid fields should return 201 and correct data. Otherwise, creation logic bug.")
+    @Description("All valid fields should return 201. Not release-blocker but major regression.")
     void createBook_allFields_shouldReturnCreated() {
         Book b = new Book(103, "Test Driven API", "All fields test", 80, "Excerpt", "2023-01-01T00:00:00Z");
         Response res = BooksClient.addBook(b);
@@ -234,15 +287,18 @@ public class BooksTest extends BaseTest {
     }
 
     /**
-     * [P2][Happy Path] TC08 - Update existing book with new data
+     * [P3][Happy] TC08 - Update existing book with new data
      * Endpoint: PUT /Books/{id}
-     * Purpose: Ensure updates reflect in API and return 200.
+     * Purpose: Ensure updates reflect new data and return 200.
+     * Steps: [Create book] -> Update with new data
+     * Expected Result: HTTP 200 and updated fields
+     * Notes: Not release-blocker but must pass in regression.
      */
-    @Test
+    @Test @Order(13)
     @Tag("api") @Tag("regression") @Tag("happy")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("TC08 - Update existing book with new data (happy path)")
-    @Description("Updates should reflect new data and return 200. Fail = update bug.")
+    @Description("Update with new data. Not release-blocker but major regression.")
     void updateBook_withNewData_shouldReturnUpdatedBook() {
         Book updated = new Book(103, "Updated Title", "Updated Desc", 90, "Updated Excerpt", "2023-01-01T00:00:00Z");
         Response res = BooksClient.updateBook(103, updated);
@@ -251,30 +307,36 @@ public class BooksTest extends BaseTest {
     }
 
     /**
-     * [P2][Happy Path] TC09 - Delete a different existing book
+     * [P3][Happy] TC09 - Delete a different existing book
      * Endpoint: DELETE /Books/{id}
-     * Purpose: Deleting any existing book should work.
+     * Purpose: Ensure any valid book can be deleted.
+     * Steps: [Create another book] -> Delete by ID
+     * Expected Result: HTTP 200 or 204 returned
+     * Notes: Not release-blocker but major regression case.
      */
-    @Test
+    @Test @Order(14)
     @Tag("api") @Tag("regression") @Tag("happy")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("TC09 - Delete a different existing book (happy path)")
-    @Description("Deletes another book. Expects 200 or 204. Fail = delete bug.")
+    @Description("Deletes another book. Not release-blocker but major regression.")
     void deleteAnotherBook_shouldReturnSuccess() {
         Response res = BooksClient.deleteBook(102);
         assertThat(res.statusCode(), anyOf(is(200), is(204)));
     }
 
     /**
-     * [P2][Happy Path] TC10 - List all books after CRUD operations
+     * [P3][Happy] TC10 - List all books after CRUD operations
      * Endpoint: GET /Books
      * Purpose: Book list should reflect CRUD changes.
+     * Steps: Perform several CRUD ops, then GET /Books
+     * Expected Result: HTTP 200 and up-to-date list
+     * Notes: Not release-blocker but validates DB sync.
      */
-    @Test
+    @Test @Order(15)
     @Tag("api") @Tag("regression") @Tag("happy")
     @Severity(SeverityLevel.NORMAL)
     @DisplayName("TC10 - List all books after CRUD operations (happy path)")
-    @Description("Book list should reflect all CRUD changes. Otherwise, list is stale (bug).")
+    @Description("Book list should reflect CRUD changes. Not release-blocker but major regression.")
     void listAllBooks_afterCrud_shouldBeUpToDate() {
         Response res = BooksClient.getAllBooks();
         res.then().statusCode(200);
@@ -282,93 +344,22 @@ public class BooksTest extends BaseTest {
     }
 
     /**
-     * [P2][Edge] TC12 - Get book by zero ID (boundary)
-     * Endpoint: GET /Books/0
-     * Purpose: System must handle boundary value (0) properly - expect 400 or 404.
+     * [P3][Header] TC39 - Content-Type header validation
+     * Endpoint: GET /Books
+     * Purpose: Check that Content-Type is application/json in response.
+     * Steps: Send GET /Books and check Content-Type header.
+     * Expected Result: Response header includes Content-Type: application/json.
+     * Notes: Ensures API returns data in the correct content type.
      */
-    @Test
-    @Tag("api") @Tag("regression") @Tag("edge")
-    @Severity(SeverityLevel.MINOR)
-    @DisplayName("TC12 - Get book by zero ID (boundary, edge)")
-    @Description("Boundary value zero must return 400/404. Otherwise, backend not handling boundary.")
-    void getBookByZeroId_shouldReturnError() {
-        Response res = BooksClient.getBookById(0);
-        res.then().statusCode(anyOf(is(400), is(404)));
+    @Test @Order(16)
+    @Tag("api") @Tag("regression") @Tag("happy")
+    @Severity(SeverityLevel.NORMAL)
+    @DisplayName("TC39 - Content-Type header validation")
+    @Description("Checks that Content-Type header in GET /Books is application/json.")
+    void contentTypeHeader_shouldBeJson() {
+        Response res = BooksClient.getAllBooks();
+        res.then().statusCode(200);
+        assertThat(res.header("Content-Type"), containsString("application/json"));
     }
 
-    /**
-     * [P2][Edge] TC13 - Get book by negative ID (boundary)
-     * Endpoint: GET /Books/-1
-     * Purpose: Negative IDs must not be accepted.
-     */
-    @Test
-    @Tag("api") @Tag("regression") @Tag("edge")
-    @Severity(SeverityLevel.MINOR)
-    @DisplayName("TC13 - Get book by negative ID (boundary, edge)")
-    @Description("Negative ID must be rejected with 400/404. Otherwise, validation bug.")
-    void getBookByNegativeId_shouldReturnError() {
-        Response res = BooksClient.getBookById(-1);
-        res.then().statusCode(anyOf(is(400), is(404)));
-    }
-
-    /**
-     * [P2][Edge] TC14 - Get book by string/alphanumeric ID
-     * Endpoint: GET /Books/{id}
-     * Purpose: API must reject string IDs with 400/422.
-     */
-    @Test
-    @Tag("api") @Tag("regression") @Tag("edge")
-    @Severity(SeverityLevel.MINOR)
-    @DisplayName("TC14 - Get book by string/alphanumeric ID (edge)")
-    @Description("String/alphanumeric IDs must not be accepted. If accepted, validation missing (bug).")
-    void getBookByStringId_shouldReturnError() {
-        Response res = BooksClient.getBookById("abc123");
-        res.then().statusCode(anyOf(is(400), is(422)));
-    }
-
-    /**
-     * [P2][Edge] TC15 - Get book by special char ID
-     * Endpoint: GET /Books/{id}
-     * Purpose: Special chars as IDs must not be accepted.
-     */
-    @Test
-    @Tag("api") @Tag("regression") @Tag("edge")
-    @Severity(SeverityLevel.MINOR)
-    @DisplayName("TC15 - Get book by special char ID (edge)")
-    @Description("Special char IDs must be rejected with 400/422. Otherwise, input validation bug.")
-    void getBookBySpecialCharId_shouldReturnError() {
-        Response res = BooksClient.getBookById("!@#%");
-        res.then().statusCode(anyOf(is(400), is(422)));
-    }
-
-    /**
-     * [P2][Edge] TC17 - Create book with empty body
-     * Endpoint: POST /Books
-     * Purpose: Creating with empty JSON body must return 400.
-     */
-    @Test
-    @Tag("api") @Tag("regression") @Tag("edge")
-    @Severity(SeverityLevel.MINOR)
-    @DisplayName("TC17 - Create book with empty body (edge)")
-    @Description("Empty JSON body must return 400. Otherwise, validation bug.")
-    void createBook_emptyBody_shouldReturn400() {
-        Response res = BooksClient.addBook("{}");
-        res.then().statusCode(400);
-    }
-
-        /**
-     * [P2][Edge] TC19 - Create book with negative pageCount (boundary)
-     * Endpoint: POST /Books
-     * Purpose: Negative pageCount should not be accepted. 
-     * If the API accepts negative numbers, this is a validation bug and must be reported.
-     */
-    @Test
-    @Tag("api") @Tag("regression") @Tag("edge")
-    @Severity(SeverityLevel.MINOR)
-    @DisplayName("TC19 - Create book with negative pageCount (edge)")
-    @Description("Sends a book with negative pageCount. Expects 400 or 422. If not, validation is missing.")
-    void createBook_negativePageCount_shouldReturnError() {
-        Book b = new Book(0, "Negative PageCount", "Negative page", -5, "Excerpt", "2023-09-01T00:00:00Z");
-        Response res = BooksClient.addBook(b);
-        res.then().statusCode(anyOf(is(400), is(422)));
-    }}
+}

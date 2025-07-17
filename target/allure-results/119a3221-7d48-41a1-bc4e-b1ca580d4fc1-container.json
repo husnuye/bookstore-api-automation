@@ -1,1 +1,0 @@
-{"uuid":"119a3221-7d48-41a1-bc4e-b1ca580d4fc1","name":"TC02 - Create new book (smoke, happy path)","children":["0729bdd4-b26f-458c-a48b-4f4a593842cf"],"befores":[{"name":"resetRestAssuredSpecs","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1752694165410,"stop":1752694165410}],"afters":[],"start":1752694165409,"stop":1752694165864}

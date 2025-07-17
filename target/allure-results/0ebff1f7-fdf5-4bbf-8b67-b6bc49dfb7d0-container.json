@@ -1,0 +1,1 @@
+{"uuid":"0ebff1f7-fdf5-4bbf-8b67-b6bc49dfb7d0","name":"TC39 - Content-Type header validation","children":["df425291-e195-41e5-bb13-b68bf4816b70"],"befores":[{"name":"resetRestAssuredSpecs","status":"passed","stage":"finished","steps":[],"attachments":[],"parameters":[],"start":1752778337707,"stop":1752778337707}],"afters":[],"start":1752778337706,"stop":1752778338848}

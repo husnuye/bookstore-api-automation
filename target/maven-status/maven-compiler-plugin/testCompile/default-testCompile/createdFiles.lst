@@ -1,3 +1,5 @@
-com/bookstore/data/TestDataProvider.class
+com/bookstore/data/AuthorTestDataProvider.class
+com/bookstore/data/BookTestDataProvider.class
 com/bookstore/tests/BooksTest.class
+com/bookstore/tests/AuthorsTest.class
 com/bookstore/base/BaseTest.class
