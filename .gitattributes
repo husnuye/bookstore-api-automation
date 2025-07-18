@@ -1,0 +1,7 @@
+# Exclude Allure report and HTML files from language statistics
+allure-report/* linguist-vendored
+docs/* linguist-vendored
+*.html linguist-vendored
+
+# Set Java files as the main language
+*.java linguist-language=Java
