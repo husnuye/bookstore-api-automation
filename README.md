@@ -438,4 +438,16 @@ Additional edge cases and Author endpoint tests can be easily added due to the s
 
  For any questions about this case study or the framework, please contact the project owner via GitHub issues or email.
 
+---
+
+## Test Results & API Limitations
+
+**Note:**  
+Some test cases may fail due to the limitations or inconsistent behavior of the public demo API (fakerestapi.com) used for automation.  
+- For example, the API may return HTTP `200` instead of the standard `201` for resource creation, or not enforce validation rules for required fields.
+- All assertions are implemented according to RESTful best practices and official documentation.
+- These failures highlight discrepancies in the demo API, not issues with the test code.
+- With a real, fully stateful production API, all tests are expected to pass.
+
+See Allure Report for full details.
 
