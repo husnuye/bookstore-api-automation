@@ -1,0 +1,17 @@
+# Maven ve Java derleme dosyaları
+/target/
+*.class
+*.log
+
+# IDE ve editor dosyaları
+.idea/
+.vscode/
+.DS_Store
+
+# Allure raporları ve geçici test sonuçları
+allure-results/
+allure-report/
+test-report/
+
+# Sistem dosyaları
+Thumbs.db
