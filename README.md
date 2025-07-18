@@ -9,7 +9,7 @@ A clean, scalable, enterprise-grade API automation framework for Books and Autho
 > Designed for rapid onboarding and easy extension by QA teams and backend developers.
 
 ---
-## 📺 Demo Video
+## Demo Video
 
 **👉 [Bookstore API Automation Demo (Vimeo)](https://vimeo.com/1102456987)**
 
