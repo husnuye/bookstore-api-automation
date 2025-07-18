@@ -3,6 +3,8 @@ allure-report/* linguist-vendored
 docs/* linguist-vendored
 *.html linguist-vendored
 *.js linguist-vendored
+*.css linguist-vendored
+Dockerfile linguist-vendored
 
 # Set Java files as the main language
 *.java linguist-language=Java
