@@ -147,6 +147,11 @@ docker run --rm -v $(pwd)/target/allure-results:/project/target/allure-results b
 
 5. [Viewing Allure Reports](#viewing-allure-reports)
 
+   ##  Viewing Allure Reports
+
+You can view the latest test execution report here:  
+👉 [Allure Live Report (GitHub Pages)](https://husnuye.github.io/bookstore-api-automation/)
+
 # After running the test suite, you can generate and view Allure reports as follows:
 
 # 1. To view an interactive report in your browser (recommended for local exploration):
