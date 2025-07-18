@@ -1,0 +1,1 @@
+{"total":2,"items":[{"uid":"1dfa9d6db3c6a762142b0ca3045bde1c","name":"Authors API E2E Test Suite (P1 + P2 + P3)","statistic":{"failed":8,"broken":0,"skipped":0,"passed":3,"unknown":0,"total":11}},{"uid":"bb72fbdfcd8777ccbaec65b8a8ebc53f","name":"Books API E2E Test Suite (P1-P3 Priority Cases)","statistic":{"failed":6,"broken":0,"skipped":0,"passed":10,"unknown":0,"total":16}}]}
