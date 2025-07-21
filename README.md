@@ -151,6 +151,20 @@ docker run --rm -v $(pwd)/target/allure-results:/project/target/allure-results b
 
 # (After Docker run, view the allure-results as above.)
 
+
+
+### API Endpoint Configuration
+
+By default, the tests run against the public Fake REST API:  
+`https://fakerestapi.azurewebsites.net`
+
+You can update the API base URL in `src/test/resources/config.properties` or set the `BASE_URL` environment variable.
+
+---
+
+> **Note:**  
+> This project uses the public Fake REST API hosted at [https://fakerestapi.azurewebsites.net](https://fakerestapi.azurewebsites.net) for testing and demo purposes.
+
 5. [Viewing Allure Reports](#viewing-allure-reports)
 
    ##  Viewing Allure Reports
