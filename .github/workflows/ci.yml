@@ -44,11 +44,12 @@ jobs:
         run: |
           docker rm bookstore-api-tests-smoke || true
 
-      # Install Allure CLI tool
-      - name: Install Allure Commandline
-        uses: allure-framework/allure-commandline@v2
-        with:
-          version: '2.21.0'
+      # Manually install Allure CLI
+      - name: Install Allure CLI
+        run: |
+          wget https://github.com/allure-framework/allure2/releases/download/2.21.0/allure-2.21.0.zip
+          unzip -q allure-2.21.0.zip -d allure
+          sudo ln -s $PWD/allure/bin/allure /usr/local/bin/allure
 
       # Generate Allure Report
       - name: Generate Allure Report
@@ -99,11 +100,12 @@ jobs:
         run: |
           docker rm bookstore-api-tests-reg || true
 
-      # Install Allure CLI tool
-      - name: Install Allure Commandline
-        uses: allure-framework/allure-commandline@v2
-        with:
-          version: '2.21.0'
+      # Manually install Allure CLI
+      - name: Install Allure CLI
+        run: |
+          wget https://github.com/allure-framework/allure2/releases/download/2.21.0/allure-2.21.0.zip
+          unzip -q allure-2.21.0.zip -d allure
+          sudo ln -s $PWD/allure/bin/allure /usr/local/bin/allure
 
       # Generate Allure Report
       - name: Generate Allure Report
