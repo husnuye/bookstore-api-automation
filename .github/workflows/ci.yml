@@ -28,7 +28,7 @@ jobs:
       - name: Build Docker image
         run: docker build -t bookstore-api-tests .
 
-      # Run the container (test execution)
+      # Run Smoke Tests in Docker container
       - name: Run Smoke Tests in Docker container
         id: run-tests
         run: |
@@ -44,13 +44,26 @@ jobs:
         run: |
           docker rm bookstore-api-tests-smoke || true
 
-      # Upload Allure results
+      # Generate Allure Report from the raw test results
+      - name: Generate Allure Report
+        run: |
+          allure generate allure-results-smoke --clean -o allure-report-smoke
+
+      # Upload raw Allure test results as an artifact
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-smoke
           path: allure-results-smoke
+
+      # Upload generated Allure HTML report as an artifact
+      - name: Upload Allure Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-smoke
+          path: allure-report-smoke
 
   # ------------- REGRESSION TEST JOB (NIGHTLY) -------------
   regression:
@@ -61,28 +74,47 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Set up Docker Buildx for modern Docker build support
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # Build Docker image for tests
       - name: Build Docker image
         run: docker build -t bookstore-api-tests .
 
+      # Run Regression Tests in Docker container
       - name: Run Regression Tests in Docker container
         id: run-tests
         run: |
           docker run --name bookstore-api-tests-reg bookstore-api-tests mvn test -Dgroups="regression" -Dallure.results.directory=target/allure-results || true
 
+      # Copy Allure results from Docker container to host machine
       - name: Copy Allure Results from Docker container
         run: |
           docker cp bookstore-api-tests-reg:/project/target/allure-results ./allure-results-regression || true
 
+      # Remove test container to clean up
       - name: Remove test container
         run: |
           docker rm bookstore-api-tests-reg || true
 
+      # Generate Allure Report from the raw test results
+      - name: Generate Allure Report
+        run: |
+          allure generate allure-results-regression --clean -o allure-report-regression
+
+      # Upload raw Allure test results as an artifact
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-regression
           path: allure-results-regression
+
+      # Upload generated Allure HTML report as an artifact
+      - name: Upload Allure Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-regression
+          path: allure-report-regression
