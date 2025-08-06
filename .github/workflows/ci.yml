@@ -46,7 +46,7 @@ jobs:
 
       # Install Allure CLI tool
       - name: Install Allure Commandline
-        uses: allure-framework/allure-commandline@v2.13.8
+        uses: allure-framework/allure-commandline@v2
         with:
           version: '2.21.0'
 
