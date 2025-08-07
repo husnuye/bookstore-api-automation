@@ -2,16 +2,14 @@ name: Bookstore API CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
   schedule:
     - cron: '0 3 * * *'  # Runs every night at 3:00 AM UTC
 
 jobs:
-  # ---------------- SMOKE TEST JOB ----------------
+  # ------------- SMOKE TEST JOB -------------
   smoke:
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -20,43 +18,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Setup Docker Buildx for advanced Docker build features
+      # Set up Docker Buildx for modern Docker build support
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Build Docker image containing test environment
+      # Build Docker image for tests
       - name: Build Docker image
         run: docker build -t bookstore-api-tests .
 
-      # Run smoke tests inside Docker container
+      # Run the container (test execution)
       - name: Run Smoke Tests in Docker container
         id: run-tests
         run: |
           docker run --name bookstore-api-tests-smoke bookstore-api-tests mvn test -Dgroups="smoke" -Dallure.results.directory=target/allure-results || true
 
-      # Copy raw Allure test results from Docker container to GitHub runner
+      # Copy Allure results from Docker container to host machine
       - name: Copy Allure Results from Docker container
         run: |
           docker cp bookstore-api-tests-smoke:/project/target/allure-results ./allure-results-smoke || true
 
-      # Remove Docker test container to clean up resources
+      # Remove test container to clean up
       - name: Remove test container
         run: |
           docker rm bookstore-api-tests-smoke || true
 
-      # Download and install Allure CLI without sudo and add it to PATH
+      # Install Allure CLI on runner (needed for HTML report generation)
       - name: Install Allure CLI
         run: |
           wget https://github.com/allure-framework/allure2/releases/download/2.21.0/allure-2.21.0.zip
           unzip -q allure-2.21.0.zip -d allure
           echo "$PWD/allure/bin" >> $GITHUB_PATH
 
-      # Generate the Allure HTML report from raw test results
+      # Generate HTML Allure report (including index.html)
       - name: Generate Allure Report
         run: |
           allure generate allure-results-smoke --clean -o allure-report-smoke
 
-      # Upload raw Allure results as artifact for archiving or further analysis
+      # Upload raw Allure results as artifact (optional, for debugging)
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
@@ -64,8 +62,8 @@ jobs:
           name: allure-results-smoke
           path: allure-results-smoke
 
-      # Upload generated Allure HTML report as artifact for easy viewing
-      - name: Upload Allure Report
+      # Upload generated Allure HTML report as artifact (open index.html directly)
+      - name: Upload Allure HTML Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -81,43 +79,37 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Setup Docker Buildx for advanced Docker build features
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Build Docker image containing test environment
       - name: Build Docker image
         run: docker build -t bookstore-api-tests .
 
-      # Run regression tests inside Docker container
       - name: Run Regression Tests in Docker container
         id: run-tests
         run: |
           docker run --name bookstore-api-tests-reg bookstore-api-tests mvn test -Dgroups="regression" -Dallure.results.directory=target/allure-results || true
 
-      # Copy raw Allure test results from Docker container to GitHub runner
       - name: Copy Allure Results from Docker container
         run: |
           docker cp bookstore-api-tests-reg:/project/target/allure-results ./allure-results-regression || true
 
-      # Remove Docker test container to clean up resources
       - name: Remove test container
         run: |
           docker rm bookstore-api-tests-reg || true
 
-      # Download and install Allure CLI without sudo and add it to PATH
+      # Install Allure CLI on runner
       - name: Install Allure CLI
         run: |
           wget https://github.com/allure-framework/allure2/releases/download/2.21.0/allure-2.21.0.zip
           unzip -q allure-2.21.0.zip -d allure
           echo "$PWD/allure/bin" >> $GITHUB_PATH
 
-      # Generate the Allure HTML report from raw test results
+      # Generate HTML Allure report (including index.html)
       - name: Generate Allure Report
         run: |
           allure generate allure-results-regression --clean -o allure-report-regression
 
-      # Upload raw Allure results as artifact for archiving or further analysis
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
@@ -125,8 +117,8 @@ jobs:
           name: allure-results-regression
           path: allure-results-regression
 
-      # Upload generated Allure HTML report as artifact for easy viewing
-      - name: Upload Allure Report
+      # Upload generated Allure HTML report as artifact
+      - name: Upload Allure HTML Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
