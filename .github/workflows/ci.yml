@@ -48,9 +48,13 @@ jobs:
         run: |
           wget https://github.com/allure-framework/allure2/releases/download/2.21.0/allure-2.21.0.zip
           unzip -q allure-2.21.0.zip -d allure
+          chmod +x allure/bin/allure    # << Ensure allure binary is executable!
+
+      # (Optional) Debug - list allure directory contents for troubleshooting
+      # - name: List Allure Directory (debug)
+      #   run: ls -lR allure
 
       # Generate HTML Allure report (output will include index.html)
-      # IMPORTANT: Call allure using its direct path to avoid PATH issues
       - name: Generate Allure Report
         run: |
           ./allure/bin/allure generate allure-results-smoke --clean -o allure-report-smoke
@@ -103,13 +107,14 @@ jobs:
         run: |
           docker rm bookstore-api-tests-reg || true
 
-      # Download and install Allure CLI
+      # Download and install Allure CLI (and make it executable)
       - name: Install Allure CLI
         run: |
           wget https://github.com/allure-framework/allure2/releases/download/2.21.0/allure-2.21.0.zip
           unzip -q allure-2.21.0.zip -d allure
+          chmod +x allure/bin/allure    # << Same fix!
 
-      # Generate HTML Allure report
+      # Generate HTML Allure report (output will include index.html)
       - name: Generate Allure Report
         run: |
           ./allure/bin/allure generate allure-results-regression --clean -o allure-report-regression
