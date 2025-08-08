@@ -2,9 +2,11 @@ name: Bookstore API CI/CD Pipeline
 
 on:
   push:
+
     branches: [main]     # Trigger when code is pushed to 'main'
   pull_request:
     branches: [main]     # Trigger on pull request to 'main'
+
   schedule:
     - cron: '0 3 * * *'  # Runs every night at 3:00 AM UTC
 
@@ -43,19 +45,25 @@ jobs:
         run: |
           docker rm bookstore-api-tests-smoke || true
 
+
       # Download and install Allure CLI on the runner (required to generate HTML report)
+
       - name: Install Allure CLI
         run: |
           wget https://github.com/allure-framework/allure2/releases/download/2.21.0/allure-2.21.0.zip
           unzip -q allure-2.21.0.zip -d allure
           echo "$PWD/allure/bin" >> $GITHUB_PATH
 
+
       # Generate the Allure HTML report (output includes index.html)
+
       - name: Generate Allure Report
         run: |
           allure generate allure-results-smoke --clean -o allure-report-smoke
 
+
       # Upload raw Allure results as an artifact (useful for debugging or local generation)
+
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
@@ -63,7 +71,9 @@ jobs:
           name: allure-results-smoke
           path: allure-results-smoke
 
+
       # Upload generated HTML report as an artifact (open index.html to view)
+
       - name: Upload Allure HTML Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -101,18 +111,26 @@ jobs:
         run: |
           docker rm bookstore-api-tests-reg || true
 
+
+
+      # Install Allure CLI on runner
+
       - name: Install Allure CLI
         run: |
           wget https://github.com/allure-framework/allure2/releases/download/2.21.0/allure-2.21.0.zip
           unzip -q allure-2.21.0.zip -d allure
           echo "$PWD/allure/bin" >> $GITHUB_PATH
 
+
       # Generate the Allure HTML report (output includes index.html)
+
       - name: Generate Allure Report
         run: |
           allure generate allure-results-regression --clean -o allure-report-regression
 
+
       # Upload Allure raw results as artifact
+
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
@@ -120,10 +138,15 @@ jobs:
           name: allure-results-regression
           path: allure-results-regression
 
+
       # Upload Allure HTML report as artifact
+
       - name: Upload Allure HTML Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-report-regression
+
           path: allure-report-regression
+
+

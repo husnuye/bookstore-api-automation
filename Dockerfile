@@ -1,10 +1,12 @@
 FROM maven:3.9.6-eclipse-temurin-17
 
+
 # Define proxy build args (useful if you build behind a proxy)
 ARG http_proxy
 ARG https_proxy
 ARG HTTP_PROXY
 ARG HTTPS_PROXY
+
 
 WORKDIR /project
 COPY . .
@@ -45,3 +47,4 @@ VOLUME ["/project/target/allure-report"]
 
 # Default: run tests automatically when the container starts
 CMD ["mvn", "clean", "test", "-DbaseUrl=https://fakerestapi.azurewebsites.net/api/v1", "-Dallure.results.directory=target/allure-results"]
+
