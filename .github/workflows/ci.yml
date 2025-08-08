@@ -2,49 +2,60 @@ name: Bookstore API CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]     # Trigger when code is pushed to 'main'
   pull_request:
-    branches:
-      - main
+    branches: [main]     # Trigger on pull request to 'main'
   schedule:
     - cron: '0 3 * * *'  # Runs every night at 3:00 AM UTC
 
 jobs:
-  # ---------------- SMOKE TEST JOB ----------------
+  # ------------- SMOKE TEST JOB -------------
   smoke:
+    # Only run this job for push or pull_request events
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     name: Smoke Tests (Dockerized)
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4   # Check out repo code
 
-      # Set up Docker Buildx for modern Docker build support
+      # Set up Docker Buildx for better build support (required for newer Docker features)
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Build Docker image for tests
+      # Build Docker image using the Dockerfile in the repo
       - name: Build Docker image
         run: docker build -t bookstore-api-tests .
 
-      # Run the container (test execution)
+      # Run the tests in Docker container using 'smoke' group (continue on failure)
       - name: Run Smoke Tests in Docker container
         id: run-tests
         run: |
           docker run --name bookstore-api-tests-smoke bookstore-api-tests mvn test -Dgroups="smoke" -Dallure.results.directory=target/allure-results || true
 
-      # Copy Allure results from Docker container to host machine
+      # Copy Allure results from Docker container to the GitHub runner
       - name: Copy Allure Results from Docker container
         run: |
           docker cp bookstore-api-tests-smoke:/project/target/allure-results ./allure-results-smoke || true
 
-      # Remove test container to clean up
+      # Clean up: remove the test container
       - name: Remove test container
         run: |
           docker rm bookstore-api-tests-smoke || true
 
-      # Upload Allure results
+      # Download and install Allure CLI on the runner (required to generate HTML report)
+      - name: Install Allure CLI
+        run: |
+          wget https://github.com/allure-framework/allure2/releases/download/2.21.0/allure-2.21.0.zip
+          unzip -q allure-2.21.0.zip -d allure
+          echo "$PWD/allure/bin" >> $GITHUB_PATH
+
+      # Generate the Allure HTML report (output includes index.html)
+      - name: Generate Allure Report
+        run: |
+          allure generate allure-results-smoke --clean -o allure-report-smoke
+
+      # Upload raw Allure results as an artifact (useful for debugging or local generation)
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
@@ -52,14 +63,23 @@ jobs:
           name: allure-results-smoke
           path: allure-results-smoke
 
+      # Upload generated HTML report as an artifact (open index.html to view)
+      - name: Upload Allure HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-smoke
+          path: allure-report-smoke
+
   # ------------- REGRESSION TEST JOB (NIGHTLY) -------------
   regression:
+    # Only run this job for scheduled events (cron)
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     name: Nightly Regression Tests (Dockerized)
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4    # Check out repo code
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -67,6 +87,7 @@ jobs:
       - name: Build Docker image
         run: docker build -t bookstore-api-tests .
 
+      # Run regression tests using 'regression' group
       - name: Run Regression Tests in Docker container
         id: run-tests
         run: |
@@ -80,9 +101,29 @@ jobs:
         run: |
           docker rm bookstore-api-tests-reg || true
 
+      - name: Install Allure CLI
+        run: |
+          wget https://github.com/allure-framework/allure2/releases/download/2.21.0/allure-2.21.0.zip
+          unzip -q allure-2.21.0.zip -d allure
+          echo "$PWD/allure/bin" >> $GITHUB_PATH
+
+      # Generate the Allure HTML report (output includes index.html)
+      - name: Generate Allure Report
+        run: |
+          allure generate allure-results-regression --clean -o allure-report-regression
+
+      # Upload Allure raw results as artifact
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-regression
           path: allure-results-regression
+
+      # Upload Allure HTML report as artifact
+      - name: Upload Allure HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-regression
+          path: allure-report-regression
